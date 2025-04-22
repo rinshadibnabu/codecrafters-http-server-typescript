@@ -8,13 +8,17 @@ const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const rawData = data.toString();
     const requestline = rawData.split("\r\n")[0];
+    const headers = {
+      Host: rawData.split("\r\n")[1],
+      Accept: rawData.split("\r\n")[2],
+      UserAgent: rawData.split("\r\n")[3],
+    };
+
     const path = requestline.split(" ")[1];
-    console.log(path);
     if (path === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else if (path.startsWith("/echo/")) {
       const str = path.substring(6);
-      console.log(str);
       const response = [
         "HTTP/1.1 200 OK",
         "Content-Type: text/plain",
@@ -23,8 +27,19 @@ const server = net.createServer((socket) => {
         str,
       ].join("\r\n");
       socket.write(response);
+    } else if (path === "/user-agent") {
+      const response = [
+        "HTTP/1.1 200 OK",
+        "Content-Type: text/plain",
+        `Content-Length: ${headers.UserAgent.length}`,
+        "",
+        headers.UserAgent,
+      ].join("\r\n");
+
+      socket.write(response);
+    } else {
+      socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
     }
-    socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
   });
   socket.on("close", () => {
     console.log("client got disconnected");
