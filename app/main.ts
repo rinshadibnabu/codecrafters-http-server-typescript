@@ -7,13 +7,20 @@ console.log("Logs from your program will appear here!");
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
     const rawData = data.toString();
+    const lines = rawData.split("\r\n");
     const requestline = rawData.split("\r\n")[0];
-    const headers = {
-      Host: rawData.split("\r\n")[1],
-      Accept: rawData.split("\r\n")[2],
-      UserAgent: rawData.split("\r\n")[3],
-    };
+    const headers: { [key: string]: string } = {};
 
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      if (line.trim() === "") break;
+      const colonIndex = line.indexOf(": ");
+      if (colonIndex === -1) continue;
+
+      const name = line.substring(0, colonIndex);
+      const value = line.substring(colonIndex + 2);
+      headers[name] = value;
+    }
     const path = requestline.split(" ")[1];
     if (path === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
@@ -28,12 +35,13 @@ const server = net.createServer((socket) => {
       ].join("\r\n");
       socket.write(response);
     } else if (path === "/user-agent") {
+      console.log(headers["User-Agent"].length);
       const response = [
         "HTTP/1.1 200 OK",
         "Content-Type: text/plain",
-        `Content-Length: ${headers.UserAgent.length}`,
+        `Content-Length: ${headers["User-Agent"].length}`,
         "",
-        headers.UserAgent,
+        headers["User-Agent"],
       ].join("\r\n");
 
       socket.write(response);
