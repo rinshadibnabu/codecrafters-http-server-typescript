@@ -10,7 +10,7 @@ const server = net.createServer((socket) => {
     const requestline = rawData.split("\r\n")[0];
     const path = requestline.split(" ")[1];
     console.log(path);
-    if (path === "/index.html") {
+    if (path === "/index.html" || path === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
