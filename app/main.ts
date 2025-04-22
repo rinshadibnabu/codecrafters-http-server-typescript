@@ -13,7 +13,7 @@ const server = net.createServer((socket) => {
     if (path === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else if (path.startsWith("/echo/")) {
-      const str = path.substring(6) + "\r\n";
+      const str = path.substring(6);
       console.log(str);
       const response = [
         "HTTP/1.1 200 OK",
