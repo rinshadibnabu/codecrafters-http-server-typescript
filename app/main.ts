@@ -13,7 +13,7 @@ const server = net.createServer((socket) => {
     if (path === "/index.html") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
     } else {
-      socket.write("HTTP/1.1 400 Not Found\r\n\r\n");
+      socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
     }
   });
   socket.on("close", () => {
