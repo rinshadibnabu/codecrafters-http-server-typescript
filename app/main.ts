@@ -10,11 +10,21 @@ const server = net.createServer((socket) => {
     const requestline = rawData.split("\r\n")[0];
     const path = requestline.split(" ")[1];
     console.log(path);
-    if (path === "/index.html" || path === "/") {
+    if (path === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
-    } else {
-      socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
+    } else if (path.startsWith("/echo/")) {
+      const str = path.substring(6) + "\r\n";
+      console.log(str);
+      const response = [
+        "HTTP/1.1 200 OK",
+        "Content-Type: text/plain",
+        `Content-Length: ${str.length}`,
+        "",
+        str,
+      ].join("\r\n");
+      socket.write(response);
     }
+    socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
   });
   socket.on("close", () => {
     console.log("client got disconnected");
