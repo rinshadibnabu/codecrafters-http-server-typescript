@@ -6,7 +6,15 @@ console.log("Logs from your program will appear here!");
 // Uncomment this to pass the first stage
 const server = net.createServer((socket) => {
   socket.on("data", (data) => {
-    socket.write("HTTP/1.1 200 OK\r\n\r\n");
+    const rawData = data.toString();
+    const requestline = rawData.split("\r\n")[0];
+    const path = requestline.split(" ")[1];
+    console.log(path);
+    if (path === "/index.html") {
+      socket.write("HTTP/1.1 200 OK\r\n\r\n");
+    } else {
+      socket.write("HTTP/1.1 400 Not Found\r\n\r\n");
+    }
   });
   socket.on("close", () => {
     console.log("client got disconnected");
