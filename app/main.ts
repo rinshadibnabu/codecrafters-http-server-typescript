@@ -42,7 +42,9 @@ const server = net.createServer((socket) => {
       return;
     } else if (parsedReq.Path.startsWith("/files/")) {
       const fileName = parsedReq.Path.substring(7);
-      const file = Bun.file(`/tmp/${fileName}`);
+      const file = Bun.file(
+        `/tmp/data/codecrafters.io/http-server-tester/${fileName}`,
+      );
       const isFileExist = await file.exists();
       if (!isFileExist) {
         socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
