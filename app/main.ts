@@ -61,6 +61,15 @@ const server = net.createServer((socket) => {
         data,
       ].join("\r\n");
       socket.write(response);
+    } else if (parsedReq.Path.startsWith("/user-agent")) {
+      const response = [
+        "HTTP/1.1 200 OK",
+        "Content-Type: application/octet-stream",
+        `Content-Length: ${parsedReq.Headers["User-Agent"].length}`,
+        "",
+        parsedReq.Headers["User-Agent"],
+      ].join("\r\n");
+      socket.write(response);
     } else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
     }
