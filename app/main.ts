@@ -89,7 +89,10 @@ const server = net.createServer((socket) => {
       parsedReq.Path.startsWith("/files/") && parsedReq.Method === "POST"
     ) {
       const fileName = parsedReq.Path.substring(7);
-      const isSuccesfull = await Bun.write(`/tmp/${fileName}`, parsedReq.Body);
+      const isSuccesfull = await Bun.write(
+        `/tmp/data/codecrafters.io/http-server-tester/${fileName}`,
+        parsedReq.Body,
+      );
       socket.write("HTTP/1.1 201 Created\r\n\r\n");
     } else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
