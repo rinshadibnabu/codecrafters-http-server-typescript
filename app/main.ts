@@ -64,7 +64,7 @@ const server = net.createServer((socket) => {
     } else if (parsedReq.Path.startsWith("/user-agent")) {
       const response = [
         "HTTP/1.1 200 OK",
-        "Content-Type: application/octet-stream",
+        "Content-Type: text/plain",
         `Content-Length: ${parsedReq.Headers["User-Agent"].length}`,
         "",
         parsedReq.Headers["User-Agent"],
