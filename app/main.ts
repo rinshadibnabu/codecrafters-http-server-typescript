@@ -89,6 +89,10 @@ const server = net.createServer((socket) => {
       parsedReq.Path.startsWith("/files/") && parsedReq.Method === "POST"
     ) {
       const fileName = parsedReq.Path.substring(7);
+      const input = Bun.file(
+        `/tmp/tmp/data/codecrafters.io/http-server-tester/${fileName}`,
+      );
+      await Bun.write(Bun.stdout, input);
       const isSuccesfull = await Bun.write(
         `/tmp/data/codecrafters.io/http-server-tester/${fileName}`,
         parsedReq.Body,
