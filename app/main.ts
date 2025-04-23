@@ -8,11 +8,12 @@ console.log("Logs from your program will appear here!");
 const pasrseReq = (rawData: string) => {
   const lines = rawData.split("\r\n");
 
-  const requestline = rawData.split("\r\n")[0];
-  const path = requestline.split(" ")[1];
+  const requestline = rawData.split("\r\n")[0].split(" ");
+  const path = requestline[1];
+  const method = requestline[0];
 
   const headers: { [key: string]: string } = {};
-
+  const body = lines[7];
   for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
     if (line.trim() == "") break;
@@ -25,7 +26,9 @@ const pasrseReq = (rawData: string) => {
   }
   const parsedReq = {
     Path: path,
+    Method: method,
     Headers: headers,
+    Body: body,
   };
   return parsedReq;
 };
@@ -40,7 +43,9 @@ const server = net.createServer((socket) => {
     if (parsedReq.Path === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
       return;
-    } else if (parsedReq.Path.startsWith("/files/")) {
+    } else if (
+      parsedReq.Path.startsWith("/files/") && parsedReq.Method === "GET"
+    ) {
       const fileName = parsedReq.Path.substring(7);
       const file = Bun.file(
         `/tmp/data/codecrafters.io/http-server-tester/${fileName}`,
@@ -80,6 +85,12 @@ const server = net.createServer((socket) => {
         str,
       ].join("\r\n");
       socket.write(response);
+    } else if (
+      parsedReq.Path.startsWith("/files/") && parsedReq.Method === "POST"
+    ) {
+      const fileName = parsedReq.Path.substring(7);
+      const isSuccesfull = await Bun.write(`/tmp/${fileName}`, parsedReq.Body);
+      socket.write("HTTP/1.1 201 Created\r\n\r\n");
     } else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
     }
