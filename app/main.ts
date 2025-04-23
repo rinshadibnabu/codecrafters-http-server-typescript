@@ -39,6 +39,7 @@ const server = net.createServer((socket) => {
     const parsedReq = pasrseReq(rawData);
     if (parsedReq.Path === "/") {
       socket.write("HTTP/1.1 200 OK\r\n\r\n");
+      return;
     } else if (parsedReq.Path.startsWith("/files/")) {
       const fileName = parsedReq.Path.substring(7);
       const file = Bun.file(`/tmp/${fileName}`);
