@@ -89,14 +89,16 @@ const server = net.createServer((socket) => {
       parsedReq.Path.startsWith("/files/") && parsedReq.Method === "POST"
     ) {
       const fileName = parsedReq.Path.substring(7);
-      const input = Bun.file(
-        `/tmp/tmp/data/codecrafters.io/http-server-tester/${fileName}`,
-      );
-      await Bun.write(Bun.stdout, input);
-      const isSuccesfull = await Bun.write(
-        `/tmp/data/codecrafters.io/http-server-tester/${fileName}`,
-        parsedReq.Body,
-      );
+      try {
+        const isSuccesfull = await Bun.write(
+          `/tmp/data/codecrafters.io/http-server-tester/${fileName}`,
+          parsedReq.Body,
+        );
+      } catch (e) {
+        console.log(e);
+        socket.write("HTTP/1.1 400 failed\r\n\r\n");
+      }
+
       socket.write("HTTP/1.1 201 Created\r\n\r\n");
     } else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
