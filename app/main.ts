@@ -70,6 +70,16 @@ const server = net.createServer((socket) => {
         parsedReq.Headers["User-Agent"],
       ].join("\r\n");
       socket.write(response);
+    } else if (parsedReq.Path.startsWith("/echo/")) {
+      const str = parsedReq.Path.substring(6);
+      const response = [
+        "HTTP/1.1 200 OK",
+        "Content-Type: text/plain",
+        `Content-Length: ${str.length}`,
+        "",
+        str,
+      ].join("\r\n");
+      socket.write(response);
     } else {
       socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
     }
