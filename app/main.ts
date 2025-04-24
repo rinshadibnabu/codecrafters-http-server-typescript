@@ -27,89 +27,91 @@ const pasrseReq = (rawData: string) => {
   }
 
   const body = lines.slice(i + 1).join("");
-  const parsedReq = {
-    Path: path,
-    Method: method,
-    Headers: headers,
-    Body: body,
-  };
-  return parsedReq;
+  return { method, path, headers, body };
 };
 
+function buildResponse(
+  status: { code: number; text: string },
+  headers: Record<string, string>,
+  body: string,
+): string {
+  const statusLine = `HTTP/1.1 ${status.code} ${status.text}`;
+  const headerStrings = Object.entries(headers).map(([key, value]) =>
+    `${key}: ${value}`
+  );
+  return `${statusLine}\r\n${headerStrings.join("\r\n")}\r\n\r\n${body}`;
+}
+
 // Uncomment this to pass the first stage
+
 const server = net.createServer((socket) => {
   socket.on("data", async (data) => {
     const file = Bun.file("/tmp/foo");
 
     const rawData = data.toString();
-    const parsedReq = pasrseReq(rawData);
-    if (parsedReq.Path === "/") {
-      socket.write("HTTP/1.1 200 OK\r\n\r\n");
+    const req = pasrseReq(rawData);
+    if (req.path === "/") {
+      socket.write(buildResponse({ code: 200, text: "ok" }, {}, ""));
       return;
-    } else if (
-      parsedReq.Path.startsWith("/files/") && parsedReq.Method === "GET"
-    ) {
-      const fileName = parsedReq.Path.substring(7);
-      const file = Bun.file(
-        `/tmp/data/codecrafters.io/http-server-tester/${fileName}`,
-      );
-      const isFileExist = await file.exists();
-      if (!isFileExist) {
-        socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
+    } else if (req.path.startsWith("/files/")) {
+      const filesBasePath = "/tmp/data/codecrafters.io/http-server-tester";
+
+      const fileName = req.path.split("/files/")[1];
+      const filePath = path.join(filesBasePath, fileName);
+
+      if (req.method == "GET") {
+        const file = Bun.file(filePath);
+
+        if (await file.exists()) {
+          const data = await file.text();
+
+          socket.write(
+            buildResponse({ code: 200, text: "Success" }, {
+              "Content-Type": "application/octet-stream",
+              "Content-Length": file.size.toString(),
+            }, data),
+          );
+        } else {
+          socket.write(
+            buildResponse({ code: 404, text: "Not Found" }, {}, ""),
+          );
+        }
       }
 
-      const data = await file.text();
-      const size = file.size;
-
-      const response = [
-        "HTTP/1.1 200 OK",
-        "Content-Type: application/octet-stream",
-        `Content-Length: ${size}`,
-        "",
-        data,
-      ].join("\r\n");
-      socket.write(response);
-    } else if (parsedReq.Path.startsWith("/user-agent")) {
-      const response = [
-        "HTTP/1.1 200 OK",
-        "Content-Type: text/plain",
-        `Content-Length: ${parsedReq.Headers["User-Agent"].length}`,
-        "",
-        parsedReq.Headers["User-Agent"],
-      ].join("\r\n");
-      socket.write(response);
-    } else if (parsedReq.Path.startsWith("/echo/")) {
-      const str = parsedReq.Path.substring(6);
-      const encoding = parsedReq.Headers["Accept-Encoding"];
-      const response = [
-        "HTTP/1.1 200 OK",
-        "Content-Type: text/plain",
-        ...(encoding !== "invalid-encoding"
-          ? [`Content-Encoding: ${encoding}`]
-          : []),
-        "",
-        str,
-      ].join("\r\n");
-      socket.write(response);
-    } else if (
-      parsedReq.Path.startsWith("/files/") && parsedReq.Method === "POST"
-    ) {
-      console.log(parsedReq.Body);
-
-      const fileName = parsedReq.Path.substring(7);
-      try {
-        const isSuccesfull = await Bun.write(
-          `/ tmp / data / codecrafters.io / http - server - tester / ${fileName}`,
-          parsedReq.Body,
-        );
-      } catch (e) {
-        console.log(e);
-        socket.write("HTTP/1.1 400 failed\r\n\r\n");
+      if (req.method === "POST") {
+        try {
+          await Bun.write(filePath, req.body);
+          socket.write(buildResponse({ code: 200, text: "Created" }, {}, ""));
+          return;
+        } catch (e) {
+          socket.write(
+            buildResponse({ code: 500, text: "Server problem" }, {}, ""),
+          );
+          return;
+        }
       }
+    } else if (req.path.startsWith("/user-agent")) {
+      const userAgent = req.headers["user-agent"] || "";
 
-      socket.write("HTTP/1.1 201 Created\r\n\r\n");
+      socket.write(buildResponse({ code: 200, text: "OK" }, {
+        "Content-Type": "testerxt/plain",
+        "Content-Length": `${req.headers["User-Agent"].length}`,
+      }, userAgent));
+    } else if (req.path.startsWith("/echo/")) {
+      const str = req.path.split("/echo/")[1];
+      const headers: Record<string, string> = {
+        "Content-Type": "text/plain",
+        "Content-Length": str.length.toString(),
+      };
+
+      if (req.headers["Content-Encoding"] === "gzip") {
+        headers["Content-Encoding"] = "gzip";
+      }
+      const encoding = req.headers["Accept-Encoding"];
+
+      socket.write(buildResponse({ code: 200, text: "OK" }, {}, str));
     } else {
-      socket.write("HTTP/1.1 404 Not Found\r\n\r\n");
+      socket.write(buildResponse({ code: 404, text: "Not found" }, {}, ""));
     }
   });
   socket.on("close", () => {
