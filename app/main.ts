@@ -81,7 +81,7 @@ const server = net.createServer((socket) => {
       if (req.method === "POST") {
         try {
           await Bun.write(filePath, req.body);
-          socket.write(buildResponse({ code: 200, text: "Created" }, {}, ""));
+          socket.write(buildResponse({ code: 201, text: "Created" }, {}, ""));
           return;
         } catch (e) {
           socket.write(
@@ -93,7 +93,7 @@ const server = net.createServer((socket) => {
     } else if (req.path.startsWith("/user-agent")) {
       const userAgent = req.headers["user-agent"] || "";
 
-      socket.write(buildResponse({ code: 201, text: "OK" }, {
+      socket.write(buildResponse({ code: 200, text: "OK" }, {
         "Content-Type": "testerxt/plain",
         "Content-Length": `${req.headers["User-Agent"].length}`,
       }, userAgent));
