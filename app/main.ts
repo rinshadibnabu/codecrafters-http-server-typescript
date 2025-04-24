@@ -91,11 +91,11 @@ const server = net.createServer((socket) => {
         }
       }
     } else if (req.path.startsWith("/user-agent")) {
-      const userAgent = req.headers["user-agent"] || "";
+      const userAgent = req.headers["User-Agent"] || "";
 
       socket.write(buildResponse({ code: 200, text: "OK" }, {
         "Content-Type": "text/plain",
-        "Content-Length": `${req.headers["User-Agent"].length}`,
+        "Content-Length": userAgent.length.toString(),
       }, userAgent));
     } else if (req.path.startsWith("/echo/")) {
       const str = req.path.split("/echo/")[1];
