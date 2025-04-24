@@ -13,8 +13,9 @@ const pasrseReq = (rawData: string) => {
   const method = requestline[0];
 
   const headers: { [key: string]: string } = {};
-  const body = lines[7];
-  for (let i = 1; i < lines.length; i++) {
+
+  let i;
+  for (i = 1; i < lines.length; i++) {
     const line = lines[i];
     if (line.trim() == "") break;
     const indexOfColon = line.indexOf(": ");
@@ -24,6 +25,8 @@ const pasrseReq = (rawData: string) => {
 
     headers[name] = value;
   }
+
+  const body = lines.slice(i + 1).join("");
   const parsedReq = {
     Path: path,
     Method: method,
@@ -88,6 +91,7 @@ const server = net.createServer((socket) => {
     } else if (
       parsedReq.Path.startsWith("/files/") && parsedReq.Method === "POST"
     ) {
+      console.log(parsedReq.Body);
       const fileName = parsedReq.Path.substring(7);
       try {
         const isSuccesfull = await Bun.write(
