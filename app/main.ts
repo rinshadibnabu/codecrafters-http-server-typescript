@@ -94,7 +94,7 @@ const server = net.createServer((socket) => {
       const userAgent = req.headers["user-agent"] || "";
 
       socket.write(buildResponse({ code: 200, text: "OK" }, {
-        "Content-Type": "testerxt/plain",
+        "Content-Type": "text/plain",
         "Content-Length": `${req.headers["User-Agent"].length}`,
       }, userAgent));
     } else if (req.path.startsWith("/echo/")) {
