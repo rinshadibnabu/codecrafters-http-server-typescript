@@ -104,12 +104,12 @@ const server = net.createServer((socket) => {
         "Content-Length": str.length.toString(),
       };
 
-      if (req.headers["Accept-Encoding"] === "gzip") {
+      const encoding = req.headers["Accept-Encoding"];
+      if (encoding === "gzip") {
         headers["Content-Encoding"] = "gzip";
       }
-      const encoding = req.headers["Accept-Encoding"];
 
-      socket.write(buildResponse({ code: 200, text: "OK" }, {}, str));
+      socket.write(buildResponse({ code: 200, text: "OK" }, headers, str));
     } else {
       socket.write(buildResponse({ code: 404, text: "Not found" }, {}, ""));
     }
