@@ -111,7 +111,7 @@ const server = net.createServer((socket) => {
 
       socket.write(buildResponse({ code: 200, text: "OK" }, headers, str));
     } else {
-      socket.write(buildResponse({ code: 404, text: "Not found" }, {}, ""));
+      socket.write(buildResponse({ code: 404, text: "Not Found" }, {}, ""));
     }
   });
   socket.on("close", () => {
