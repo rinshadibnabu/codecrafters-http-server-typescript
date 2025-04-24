@@ -66,7 +66,7 @@ const server = net.createServer((socket) => {
           const data = await file.text();
 
           socket.write(
-            buildResponse({ code: 200, text: "Success" }, {
+            buildResponse({ code: 200, text: "OK" }, {
               "Content-Type": "application/octet-stream",
               "Content-Length": file.size.toString(),
             }, data),
