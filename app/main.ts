@@ -83,7 +83,7 @@ const server = net.createServer((socket) => {
       const response = [
         "HTTP/1.1 200 OK",
         "Content-Type: text/plain",
-        `Content-Length: ${str.length}`,
+        `Content-Encoding: ${parsedReq.Headers["Accept-Encoding"]}`,
         "",
         str,
       ].join("\r\n");
@@ -95,7 +95,7 @@ const server = net.createServer((socket) => {
       const fileName = parsedReq.Path.substring(7);
       try {
         const isSuccesfull = await Bun.write(
-          `/tmp/data/codecrafters.io/http-server-tester/${fileName}`,
+          `/ tmp / data / codecrafters.io / http - server - tester / ${fileName}`,
           parsedReq.Body,
         );
       } catch (e) {
