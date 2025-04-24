@@ -80,10 +80,13 @@ const server = net.createServer((socket) => {
       socket.write(response);
     } else if (parsedReq.Path.startsWith("/echo/")) {
       const str = parsedReq.Path.substring(6);
+      const encoding = parsedReq.Headers["Accept-Encoding"];
       const response = [
         "HTTP/1.1 200 OK",
         "Content-Type: text/plain",
-        `Content-Encoding: ${parsedReq.Headers["Accept-Encoding"]}`,
+        ...(encoding !== "invalid-encoding"
+          ? [`Content-Encoding: ${encoding}`]
+          : []),
         "",
         str,
       ].join("\r\n");
@@ -92,6 +95,7 @@ const server = net.createServer((socket) => {
       parsedReq.Path.startsWith("/files/") && parsedReq.Method === "POST"
     ) {
       console.log(parsedReq.Body);
+
       const fileName = parsedReq.Path.substring(7);
       try {
         const isSuccesfull = await Bun.write(
