@@ -50,7 +50,7 @@ const server = net.createServer((socket) => {
     const rawData = data.toString();
     const req = pasrseReq(rawData);
     if (req.path === "/") {
-      socket.write(buildResponse({ code: 200, text: "ok" }, {}, ""));
+      socket.write(buildResponse({ code: 200, text: "OK" }, {}, ""));
       return;
     } else if (req.path.startsWith("/files/")) {
       const filesBasePath = "/tmp/data/codecrafters.io/http-server-tester";
