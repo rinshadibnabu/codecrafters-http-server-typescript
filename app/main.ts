@@ -1,7 +1,6 @@
 import type { BunFile } from "bun";
 import * as net from "node:net";
-import path from "node:path/win32";
-
+import path from "node:path";
 // You can use print statements as follows for debugging, they'll be visible when running tests.
 console.log("Logs from your program will appear here!");
 
@@ -57,6 +56,7 @@ const server = net.createServer((socket) => {
       const filesBasePath = "/tmp/data/codecrafters.io/http-server-tester";
 
       const fileName = req.path.split("/files/")[1];
+      console.log(fileName);
       const filePath = path.join(filesBasePath, fileName);
 
       if (req.method == "GET") {
