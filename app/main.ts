@@ -104,7 +104,7 @@ const server = net.createServer((socket) => {
         "Content-Length": str.length.toString(),
       };
 
-      if (req.headers["Content-Encoding"] === "gzip") {
+      if (req.headers["Accept-Encoding"] === "gzip") {
         headers["Content-Encoding"] = "gzip";
       }
       const encoding = req.headers["Accept-Encoding"];
