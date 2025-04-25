@@ -80,6 +80,7 @@ const server = net.createServer((socket) => {
           socket.write(
             buildResponse({ code: 200, text: "OK" }, {
               "Content-Type": "application/octet-stream",
+              "Connection": "close",
               "Content-Length": file.size.toString(),
             }, data),
           );
@@ -93,7 +94,11 @@ const server = net.createServer((socket) => {
       if (req.method === "POST") {
         try {
           await Bun.write(filePath, req.body);
-          socket.write(buildResponse({ code: 201, text: "Created" }, {}, ""));
+          socket.write(
+            buildResponse({ code: 201, text: "Created" }, {
+              "Connection": "close",
+            }, ""),
+          );
           return;
         } catch (e) {
           socket.write(
