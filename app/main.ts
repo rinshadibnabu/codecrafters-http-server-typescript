@@ -60,9 +60,7 @@ const server = net.createServer((socket) => {
   socket.on("data", async (data) => {
     const rawData = data.toString();
     const req = pasrseReq(rawData);
-    if (req.headers["Connection"] == "close") {
-      socket.end();
-    }
+
     if (req.path === "/") {
       socket.write(buildResponse({ code: 200, text: "OK" }, {}, ""));
       return;
@@ -128,6 +126,9 @@ const server = net.createServer((socket) => {
       socket.write(
         buildResponse({ code: 200, text: "OK" }, headers, str),
       );
+      if (req.headers["Connection"] == "close") {
+        socket.end();
+      }
     } else {
       socket.write(buildResponse({ code: 404, text: "Not Found" }, {}, ""));
     }
