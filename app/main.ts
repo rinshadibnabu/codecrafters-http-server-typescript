@@ -56,14 +56,13 @@ function buildResponse(
   }
 }
 
-// Uncomment this to pass the first stage
-
 const server = net.createServer((socket) => {
   socket.on("data", async (data) => {
-    const file = Bun.file("/tmp/foo");
-
     const rawData = data.toString();
     const req = pasrseReq(rawData);
+    if (req.headers["Connection"] == "close") {
+      socket.end();
+    }
     if (req.path === "/") {
       socket.write(buildResponse({ code: 200, text: "OK" }, {}, ""));
       return;
