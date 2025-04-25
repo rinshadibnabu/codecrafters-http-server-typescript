@@ -35,6 +35,7 @@ function buildResponse(
   body: string | Uint8Array,
 ): Uint8Array {
   const statusLine = `HTTP/1.1 ${status.code} ${status.text}`;
+
   const headerLines = Object.entries(headers)
     .map(([key, value]) => `${key}: ${value}`)
     .join("\r\n");
@@ -63,7 +64,6 @@ const server = net.createServer((socket) => {
 
     if (req.path === "/") {
       socket.write(buildResponse({ code: 200, text: "OK" }, {}, ""));
-      return;
     } else if (req.path.startsWith("/files/")) {
       const filesBasePath = "/tmp/data/codecrafters.io/http-server-tester";
 
@@ -131,11 +131,11 @@ const server = net.createServer((socket) => {
       socket.write(
         buildResponse({ code: 200, text: "OK" }, headers, str),
       );
-      if (req.headers["Connection"] == "close") {
-        socket.end();
-      }
     } else {
       socket.write(buildResponse({ code: 404, text: "Not Found" }, {}, ""));
+    }
+    if (req.headers["Connection"] == "close") {
+      socket.end();
     }
   });
   socket.on("close", () => {
