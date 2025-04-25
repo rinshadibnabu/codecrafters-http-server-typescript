@@ -104,11 +104,13 @@ const server = net.createServer((socket) => {
         "Content-Length": str.length.toString(),
       };
 
-      const encodingArry = req.headers["Accept-Encoding"].split(",");
-      console.log(encodingArry);
-      for (let i = 0; i < encodingArry.length; i++) {
-        if (encodingArry[i].trim() === "gzip") {
-          headers["Content-Encoding"] = "gzip";
+      if (req.headers["Accept-Encoding"]) {
+        const encodingArry = req.headers["Accept-Encoding"].split(",");
+        console.log(encodingArry);
+        for (let i = 0; i < encodingArry.length; i++) {
+          if (encodingArry[i].trim() === "gzip") {
+            headers["Content-Encoding"] = "gzip";
+          }
         }
       }
 
