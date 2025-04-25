@@ -108,6 +108,7 @@ const server = net.createServer((socket) => {
       socket.write(buildResponse({ code: 200, text: "OK" }, {
         "Content-Type": "text/plain",
         "Content-Length": userAgent.length.toString(),
+        "Connection": "close",
       }, userAgent));
     } else if (req.path.startsWith("/echo/")) {
       let str: string | Uint8Array = req.path.split("/echo/")[1];
