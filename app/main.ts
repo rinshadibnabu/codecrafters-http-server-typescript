@@ -20,8 +20,8 @@ const pasrseReq = (rawData: string) => {
     const indexOfColon = line.indexOf(": ");
     if (indexOfColon == -1) continue;
     const name = line.substring(0, indexOfColon);
-    const value = line.substring(indexOfColon + 2);
 
+    const value = line.substring(indexOfColon + 2);
     headers[name] = value;
   }
 
@@ -104,9 +104,12 @@ const server = net.createServer((socket) => {
         "Content-Length": str.length.toString(),
       };
 
-      const encoding = req.headers["Accept-Encoding"];
-      if (encoding === "gzip") {
-        headers["Content-Encoding"] = "gzip";
+      const encodingArry = req.headers["Accept-Encoding"].split(",");
+      console.log(encodingArry);
+      for (let i = 0; i < encodingArry.length; i++) {
+        if (encodingArry[i].trim() === "gzip") {
+          headers["Content-Encoding"] = "gzip";
+        }
       }
 
       socket.write(buildResponse({ code: 200, text: "OK" }, headers, str));
