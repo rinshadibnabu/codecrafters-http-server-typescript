@@ -122,7 +122,7 @@ const server = net.createServer((socket) => {
       }
 
       headers["Content-Length"] = str.length.toString();
-
+      headers["Connection"] = "close";
       socket.write(
         buildResponse({ code: 200, text: "OK" }, headers, str),
       );
