@@ -32,13 +32,28 @@ const pasrseReq = (rawData: string) => {
 function buildResponse(
   status: { code: number; text: string },
   headers: Record<string, string>,
-  body: string,
-): string {
+  body: string | Uint8Array,
+): Uint8Array {
   const statusLine = `HTTP/1.1 ${status.code} ${status.text}`;
-  const headerStrings = Object.entries(headers).map(([key, value]) =>
-    `${key}: ${value}`
-  );
-  return `${statusLine}\r\n${headerStrings.join("\r\n")}\r\n\r\n${body}`;
+  const headerLines = Object.entries(headers)
+    .map(([key, value]) => `${key}: ${value}`)
+    .join("\r\n");
+  const head = `${statusLine}\r\n${headerLines}\r\n\r\n`;
+
+  const headBytes = new TextEncoder().encode(head);
+
+  if (typeof body === "string") {
+    const bodyBytes = new TextEncoder().encode(body);
+    const full = new Uint8Array(headBytes.length + bodyBytes.length);
+    full.set(headBytes);
+    full.set(bodyBytes, headBytes.length);
+    return full;
+  } else {
+    const full = new Uint8Array(headBytes.length + body.length);
+    full.set(headBytes);
+    full.set(body, headBytes.length);
+    return full;
+  }
 }
 
 // Uncomment this to pass the first stage
@@ -98,23 +113,22 @@ const server = net.createServer((socket) => {
         "Content-Length": userAgent.length.toString(),
       }, userAgent));
     } else if (req.path.startsWith("/echo/")) {
-      const str = req.path.split("/echo/")[1];
+      let str: string | Uint8Array = req.path.split("/echo/")[1];
+
       const headers: Record<string, string> = {
         "Content-Type": "text/plain",
-        "Content-Length": str.length.toString(),
       };
 
-      if (req.headers["Accept-Encoding"]) {
-        const encodingArry = req.headers["Accept-Encoding"].split(",");
-        console.log(encodingArry);
-        for (let i = 0; i < encodingArry.length; i++) {
-          if (encodingArry[i].trim() === "gzip") {
-            headers["Content-Encoding"] = "gzip";
-          }
-        }
+      if (req.headers["Accept-Encoding"]?.includes("gzip")) {
+        str = Bun.gzipSync(str);
+        headers["Content-Encoding"] = "gzip";
       }
 
-      socket.write(buildResponse({ code: 200, text: "OK" }, headers, str));
+      headers["Content-Length"] = str.length.toString();
+
+      socket.write(
+        buildResponse({ code: 200, text: "OK" }, headers, str),
+      );
     } else {
       socket.write(buildResponse({ code: 404, text: "Not Found" }, {}, ""));
     }
