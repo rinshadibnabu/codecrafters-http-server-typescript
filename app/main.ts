@@ -6,6 +6,7 @@ console.log("Logs from your program will appear here!");
 
 import { pasrseReq } from "./requestParser";
 import { buildResponse } from "./responseBuilder";
+
 const server = net.createServer((socket): void => {
   socket.on("data", async (data: Buffer): Promise<void> => {
     const rawData = data.toString();
