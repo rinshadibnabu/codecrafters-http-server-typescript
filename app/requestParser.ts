@@ -1,10 +1,22 @@
-export const pasrseReq = (rawData: string) => {
+type Method = "GET" | "POST";
+export type RequestType = {
+  method: Method;
+  path: string;
+  headers: Record<string, string>;
+  body: string;
+};
+
+export const pasrseReq = (rawData: string): RequestType => {
   const lines = rawData.split("\r\n");
 
   const requestline = rawData.split("\r\n")[0].split(" ");
   const path = requestline[1];
-  const method = requestline[0];
+  const rawMethod = requestline[0];
+  if (rawMethod !== "GET" && rawMethod !== "POST") {
+    throw new Error("Unsupported method");
+  }
 
+  const method: Method = rawMethod;
   const headers: { [key: string]: string } = {};
 
   let i;

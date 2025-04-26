@@ -1,7 +1,7 @@
+import type { RequestType } from "../requestParser";
 import { buildResponse } from "../responseBuilder";
-
-
-export function echoHandler(req, socket) {
+import { Socket } from "node:net";
+export function echoHandler(req: RequestType, socket: Socket) {
   let str: string | Uint8Array = req.path.split("/echo/")[1];
 
   const headers: Record<string, string> = {
@@ -17,11 +17,4 @@ export function echoHandler(req, socket) {
   socket.write(
     buildResponse({ code: 200, text: "OK" }, headers, str),
   );
-} else {
-  socket.write(buildResponse({ code: 404, text: "Not Found" }, {}, ""));
-}
-if (req.headers["Connection"] == "close") {
-  socket.end();
-}
-
 }

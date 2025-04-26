@@ -1,6 +1,7 @@
+import type { RequestType } from "../requestParser";
 import { buildResponse } from "../responseBuilder";
-
-export function userAgentHandler(req, socket) {
+import { Socket } from "node:net";
+export function userAgentHandler(req: RequestType, socket: Socket) {
   const userAgent = req.headers["User-Agent"] || "";
 
   socket.write(buildResponse({ code: 200, text: "OK" }, {

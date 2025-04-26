@@ -1,8 +1,9 @@
 import { buildResponse } from "../responseBuilder";
-
+import { Socket } from "node:net";
 import path from "node:path";
+import type { RequestType } from "../requestParser";
 
-export async function fileHandler(req, socket) {
+export async function fileHandler(req: RequestType, socket: Socket) {
   const filesBasePath = "/tmp/data/codecrafters.io/http-server-tester";
 
   const fileName = req.path.split("/files/")[1];
