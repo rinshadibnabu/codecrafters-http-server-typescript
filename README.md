@@ -1,3 +1,4 @@
+i stareted this project cause my inability to fully grasp the full stack concepts , i could easily build a full stack appication with react and express or using next js but i didn't understand how things were working .After building this project i have grasped vague understanding of how the backend works 
 [![progress-banner](https://backend.codecrafters.io/progress/http-server/f9295d9d-2915-419d-b7b0-748b008a9494)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
 
 This is a starting point for TypeScript solutions to the
@@ -10,21 +11,6 @@ that is capable of serving multiple clients.
 Along the way you'll learn about TCP servers,
 [HTTP request syntax](https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html),
 and more.
-
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
-
-# Passing the first stage
-
-The entry point for your HTTP server implementation is in `app/main.ts`. Study
-and uncomment the relevant code, and push your changes to pass the first stage:
-
-```sh
-git commit -am "pass 1st stage" # any msg
-git push origin master
-```
-
-Time to move on to the next stage!
 
 # Stage 2 & beyond
 
