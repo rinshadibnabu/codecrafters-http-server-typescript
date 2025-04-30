@@ -6,6 +6,10 @@ import type { RequestType } from "../requestParser";
 import { Socket } from "node:net";
 
 export async function router(req: RequestType, socket: Socket) {
+  if (req.headers["Connection"] == "close") {
+    socket.end();
+  }
+
   if (req.path === "/") {
     socket.write(
       buildResponse({ code: 200, text: "OK" }, { "Connection": "close" }, ""),
