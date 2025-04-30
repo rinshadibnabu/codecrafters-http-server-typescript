@@ -10,6 +10,7 @@ const server = net.createServer((socket: net.Socket): void => {
     const req = pasrseReq(rawData);
     router(req, socket);
   });
+
   socket.on("close", () => {
     console.log("client got disconnected");
     socket.end();
