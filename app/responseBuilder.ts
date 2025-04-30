@@ -4,9 +4,6 @@ export function buildResponse(
   body: string | Uint8Array,
 ): Uint8Array | string {
   const statusLine = `HTTP/1.1 ${status.code} ${status.text}`;
-  if (!body && Object.keys(headers).length === 0) {
-    return statusLine;
-  }
 
   const headerLines = Object.entries(headers)
     .map(([key, value]) => `${key}: ${value}`)
